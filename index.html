@@ -65,8 +65,8 @@
 			const pmremGenerator = new THREE.PMREMGenerator( renderer );
 
 			const scene = new THREE.Scene();
-			scene.background = new THREE.Color( 0xc3c3c3);
-			scene.envronment = pmremGenerator.fromScene( new RoomEnvironment( renderer ), 0.04 ).texture;
+			scene.background = new THREE.Color( 0xbfe3dd );
+			scene.environment = pmremGenerator.fromScene( new RoomEnvironment( renderer ), 0.04 ).texture;
 
 			const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
 			camera.position.set( 2.85, 5.13, 0 );
@@ -156,4 +156,3 @@
 	</body>
 
 </html>
-
