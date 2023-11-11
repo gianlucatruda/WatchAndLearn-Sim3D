@@ -22,7 +22,15 @@
 
         <!-- Add this div for displaying the parameters -->
         <div id="info" style="position: absolute; top: 0; right: 0; left: auto; color: white; background: rgba(0, 0, 0, 0.5); padding: 10px;">
-            <!-- Parameters will be displayed here -->
+        </div>
+        <!-- Parameters will be displayed here -->
+        <div id="params" style="position: absolute; bottom:0; top: auto; right: 0; left: auto; color: white; background: rgba(0, 0, 0, 0.5); padding: 10px;">
+            <label for="pipette-x">Pipette X:</label>
+            <input type="number" id="pipette-x" step="0.01">
+            <label for="pipette-y">Pipette Y:</label>
+            <input type="number" id="pipette-y" step="0.01">
+            <label for="pipette-z">Pipette Z:</label>
+            <input type="number" id="pipette-z" step="0.01">
         </div>
 
 
@@ -95,14 +103,59 @@
 			loader.load( '96well.glb', function ( gltf ) {
 
 				well = gltf.scene;
-				well.position.set( 0, 0, -0.75 );
+				well.position.set( 0, 0, -0.85 );
 				well.scale.set( 0.01, 0.01, 0.01 );
 				scene.add( well );
+
+                // Update input fields with initial position
+                document.getElementById('pipette-x').value = pipette.position.x.toFixed(2);
+                document.getElementById('pipette-y').value = pipette.position.y.toFixed(2);
+                document.getElementById('pipette-z').value = pipette.position.z.toFixed(2);
+
+                // Add event listeners to input fields
+                document.getElementById('pipette-x').addEventListener('input', function (event) {
+                    pipette.position.x = parseFloat(event.target.value);
+                });
+                document.getElementById('pipette-y').addEventListener('input', function (event) {
+                    pipette.position.y = parseFloat(event.target.value);
+                });
+                document.getElementById('pipette-z').addEventListener('input', function (event) {
+                    pipette.position.z = parseFloat(event.target.value);
+                });
+
 			}, undefined, function ( e ) {
 				console.error( e );
 
 			} );
 
+            // Waypoint movements
+            const DY = -0.3;
+            const ZS = -((1.12/12) + 0.00)
+            const waypoints = [
+                { x: 0, y: 0, z: 0 },
+                { x: 0, y: 0, z: 1*ZS },
+                { x: 0, y: DY, z: 1*ZS },
+                { x: 0, y: 0, z: 1*ZS },
+                { x: 0, y: 0, z: 9*ZS },
+                { x: 0, y: DY, z: 9*ZS },
+                { x: 0, y: 0, z: 9*ZS },
+                { x: 0, y: 0, z: 3*ZS },
+                { x: 0, y: DY, z: 3*ZS },
+                { x: 0, y: 0, z: 3*ZS },
+                { x: 0, y: 0, z: 9*ZS },
+                { x: 0, y: DY, z: 9*ZS },
+                { x: 0, y: 0, z: 9*ZS },
+                { x: 0, y: 0, z: 5*ZS },
+                { x: 0, y: DY, z: 5*ZS },
+                { x: 0, y: 0, z: 5*ZS },
+                { x: 0, y: 0, z: 9*ZS },
+                { x: 0, y: DY, z: 9*ZS },
+                { x: 0, y: 0, z: 9*ZS },
+                { x: 0, y: DY, z: 9*ZS },
+                { x: 0, y: 0, z: 9*ZS },
+            ];
+            let currentWaypointIndex = 0;
+            let movingDimension = 'x'; // Start moving in the 'x' dimension
 
 		    animate();
 
@@ -121,10 +174,6 @@
 				requestAnimationFrame( animate );
 
 				const delta = clock.getDelta();
-                // Update the model's position
-                if (pipette.position.z < 0.5) {
-                    // pipette.position.z += 0.01; // Adjust the value to control the speed of movement
-                }
 
 				controls.update();
 
@@ -144,7 +193,32 @@
 
                 infoElement.innerHTML = infoText;
 
-                renderer.render(scene, camera);
+
+                if (pipette && waypoints.length > 0) {
+                    const currentWaypoint = waypoints[currentWaypointIndex];
+                    let reachedWaypoint = true;
+
+                    // Move in one dimension at a time
+                    ['x', 'y', 'z'].forEach((dimension) => {
+                        if (movingDimension === dimension) {
+                            if (Math.abs(pipette.position[dimension] - currentWaypoint[dimension]) > 0.01) {
+                                // Move towards the waypoint in the current dimension
+                                const direction = Math.sign(currentWaypoint[dimension] - pipette.position[dimension]);
+                                pipette.position[dimension] += 0.01 * direction; // Adjust the speed factor (0.01) as needed
+                                reachedWaypoint = false;
+                            } else {
+                                // Once reached in the current dimension, switch to the next dimension
+                                movingDimension = dimension === 'z' ? 'x' : (dimension === 'y' ? 'z' : 'y');
+                            }
+                        }
+                    });
+
+                    // If the waypoint is reached in all dimensions, move to the next waypoint
+                    if (reachedWaypoint && currentWaypointIndex < waypoints.length - 1) {
+                        currentWaypointIndex++;
+                        console.log('Reached waypoint', currentWaypointIndex);
+                    }
+                }
 
 				renderer.render( scene, camera );
 
