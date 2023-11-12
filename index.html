@@ -179,6 +179,16 @@
 
 				stats.update();
 
+                // Add camera movement
+                const radius = 5; // Distance from the center of the scene
+                const speed = 0.5; // Speed of the movement
+                const time = Date.now() * 0.0005 * speed;
+
+                // Circular motion in XZ plane
+                camera.position.x = Math.sin(time) * radius;
+                camera.position.z = Math.cos(time) * radius;
+                camera.lookAt(scene.position); // Ensure the camera always looks at the center of the scene
+
                 // Displaying the parameters
                 const infoElement = document.getElementById('info');
                 let infoText = `Camera Position: x=${camera.position.x.toFixed(2)}, y=${camera.position.y.toFixed(2)}, z=${camera.position.z.toFixed(2)}<br>`;
