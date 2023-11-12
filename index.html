@@ -203,8 +203,7 @@
 
                 infoElement.innerHTML = infoText;
 
-
-                if (pipette && waypoints.length > 0) {
+                    if (pipette && waypoints.length > 0) {
                     const currentWaypoint = waypoints[currentWaypointIndex];
                     let reachedWaypoint = true;
 
@@ -224,11 +223,17 @@
                     });
 
                     // If the waypoint is reached in all dimensions, move to the next waypoint
-                    if (reachedWaypoint && currentWaypointIndex < waypoints.length - 1) {
+                    if (reachedWaypoint) {
                         currentWaypointIndex++;
+                        if (currentWaypointIndex >= waypoints.length) {
+                            currentWaypointIndex = 0; // Reset to the first waypoint to loop
+                            movingDimension = 'x'; // Reset moving dimension to start
+                        }
                         console.log('Reached waypoint', currentWaypointIndex);
                     }
                 }
+
+
 
 				renderer.render( scene, camera );
 
