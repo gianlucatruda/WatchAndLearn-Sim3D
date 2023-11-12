@@ -5,26 +5,11 @@
 </head>
 <body>
     <div class="mermaid">
-        graph TD
-        subgraph setup
-        style setup fill:#85C1E9,stroke:#333,stroke-width:3px
-        A[Place microtiter plate]
-        B[Calibrate pipettes and arrange supplies]
-        end
-
-        subgraph mainProtocol
-        style mainProtocol fill:#C39BD3,stroke:#333,stroke-width:3px
-        C[Ingredient A Transfer 25 µL]
-        D[Ingredient B Transfer 1 µL]
-        E[Ingredient C Transfer 1 µL]
-        F[Mixing and Transfer]
-        end
-
-        A -->|Prepare| B
-        B -->|Execute| C
-        C -->|Execute| D
-        D -->|Execute| E
-        E -->|Execute| F
+        graph LR
+        D[Ingredient A: 25 µL] -->|From A1 to A9| E((Well A9))
+        F[Ingredient B: 1 µL] -->|From A3 to A9| E
+        G[Ingredient C: 1 µL] -->|From A5 to A9| E
+        E --> H[Mixed Liquid in Well A9]
     </div>
 
     <script>
