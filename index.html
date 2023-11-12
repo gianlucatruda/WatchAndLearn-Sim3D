@@ -168,6 +168,8 @@
 
 			};
 
+            let lastWaypointTime = 0;
+            const pauseDuration = 3000; // Pause duration in milliseconds
 
 			function animate() {
 
@@ -222,16 +224,27 @@
                         }
                     });
 
-                    // If the waypoint is reached in all dimensions, move to the next waypoint
-                    if (reachedWaypoint) {
-                        currentWaypointIndex++;
-                        if (currentWaypointIndex >= waypoints.length) {
-                            currentWaypointIndex = 0; // Reset to the first waypoint to loop
-                            movingDimension = 'x'; // Reset moving dimension to start
+                        // If the waypoint is reached in all dimensions, move to the next waypoint
+                        if (reachedWaypoint) {
+                            if (currentWaypointIndex >= waypoints.length - 1) {
+                                // If the last waypoint is reached, record the time
+                                if (lastWaypointTime === 0) {
+                                    lastWaypointTime = Date.now();
+                                }
+
+                                // Check if the pause duration has elapsed
+                                if (Date.now() - lastWaypointTime > pauseDuration) {
+                                    // Reset for the next loop
+                                    currentWaypointIndex = 0;
+                                    movingDimension = 'x';
+                                    lastWaypointTime = 0; // Reset the timer
+                                }
+                            } else {
+                                currentWaypointIndex++;
+                                console.log('Reached waypoint', currentWaypointIndex);
+                            }
                         }
-                        console.log('Reached waypoint', currentWaypointIndex);
                     }
-                }
 
 
 
