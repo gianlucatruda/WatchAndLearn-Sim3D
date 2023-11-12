@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        /* Add your custom styles here */
+    </style>
+    <title>Opentrons Liquid Transfer Animation</title>
+</head>
+<body>
+
+<div id="plate"></div>
+
+<script>
+    const plateWidth = 800;
+    const plateHeight = 550;
+    const wellRadius = 15;
+
+    // Mock data for well positions
+    const wellData = Array.from({ length: 8}, (_, row) =>
+        Array.from({ length: 12 }, (_, col) => ({ row, col }))
+    ).flat();
+    // Initialize D3 plate SVG
+    const svg = d3.select("#plate")
+        .append("svg")
+        .attr("width", plateWidth)
+        .attr("height", plateHeight);
+    // Add a rectangle to enclose the whole plate
+    svg.append("rect")
+        .attr("width", plateWidth)
+        .attr("height", plateHeight)
+        .attr("fill", "none")
+        .attr("stroke", "black")
+        .attr("stroke-width", 2);
+    // Draw wells on the plate
+    const wells = svg.selectAll(".well")
+        .data(wellData)
+        .enter().append("circle")
+        .attr("class", "well")
+        .attr("cx", d => (d.col + 1) * 60)
+        .attr("cy", d => (d.row + 1) * 60)
+        .attr("r", wellRadius)
+        .style("fill", d => d.row === 0 && [0, 2, 4].includes(d.col) ? "blue" : "lightgray")
+        .style("stroke", "black");
+
+    // Label for the 9th well
+    svg.append("text")
+        .attr("x", 9 * 60)
+        .attr("y", 20)
+        .text("Destination Well")
+        .attr("text-anchor", "middle");
+
+    // Label the first row with numbers 1-12
+    const rowLabels = svg.selectAll(".row-label")
+        .data(Array.from({ length: 12 }, (_, i) => i + 1))
+        .enter().append("text")
+        .attr("class", "row-label")
+        .attr("x", (d, i) => (i + 1) * 60)
+        .attr("y", 40)
+        .text(d => d)
+        .attr("text-anchor", "middle")
+        .style("font-size", "12px");
+
+    // Label the first column with letters A-H
+    const colLabels = svg.selectAll(".col-label")
+        .data(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'])
+        .enter().append("text")
+        .attr("class", "col-label")
+        .attr("x", 10)
+        .attr("y", (d, i) => (i + 1) * 60)
+        .text(d => d)
+        .attr("text-anchor", "middle")
+        .style("font-size", "12px");
+
+    // Animation
+    const animationData = [
+        { well: { row: 0, col: 0 }, action: "dim" },
+        { well: { row: 0, col: 8 }, action: "draw", color: "blue" },
+        { well: { row: 0, col: 2 }, action: "dim" },
+        { well: { row: 0, col: 4 }, action: "dim" },
+    ];
+
+    function animate() {
+        const duration = 1000;
+
+        animationData.forEach((data, index) => {
+            const { row, col } = data.well;
+            const wellIndex = row * 12 + col;
+            const well = wells.nodes()[wellIndex];
+
+            setTimeout(() => {
+                if (data.action === "draw") {
+                    // Animate well color based on action
+                    d3.select(well)
+                        .transition()
+                        .duration(duration)
+                        .style("fill", data.color);
+                } else if (data.action === "dim") {
+                    // Dim well at the same time as the 9th well lights up
+                    d3.select(well)
+                        .transition()
+                        .duration(duration)
+                        .style("fill", "lightgray");
+                }
+            }, index * duration * 2);
+
+            if (index === animationData.length - 1) {
+                // Restart the animation
+                setTimeout(animate, (index + 1) * duration * 2);
+            }
+        });
+    }
+
+    // Start the animation
+    animate();
+</script>
+
+</body>
+</html>
