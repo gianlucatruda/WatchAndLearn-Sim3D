@@ -6,12 +6,12 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
-				background-color: #bfe3dd;
+				background-color: #c2c9d6;
 				color: #000;
 			}
 
 			a {
-				color: #2983ff;
+				color: #c2c9d6;
 			}
 		</style>
 	</head>
@@ -73,7 +73,7 @@
 			const pmremGenerator = new THREE.PMREMGenerator( renderer );
 
 			const scene = new THREE.Scene();
-			scene.background = new THREE.Color( 0xbfe3dd );
+			scene.background = new THREE.Color( 0xc2c9d6 );
 			scene.environment = pmremGenerator.fromScene( new RoomEnvironment( renderer ), 0.04 ).texture;
 
 			const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
